@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Category</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 40px; }
+        .form-card { background: white; padding: 24px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; color: white; text-decoration: none; display: inline-block; }
+        .btn-save { background: #52c41a; }
+        .btn-cancel { background: #8c8c8c; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <h2>Edit Category</h2>
+        <form th:action="@{/admin/categories/update/{id}(id=${category.id})}" th:object="${category}" method="post">
+            <label>Category Name:</label>
+            <input type="text" th:field="*{name}" required />
+            
+            <label>Slug:</label>
+            <input type="text" th:field="*{slug}" />
+            
+            <button type="submit" class="btn btn-save">Save Changes</button>
+            <a th:href="@{/admin/dashboard}" class="btn btn-cancel">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

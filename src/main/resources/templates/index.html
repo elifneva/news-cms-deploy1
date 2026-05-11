@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>News CMS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f0f2f5; }
+        .top-bar { background: #e63946; color: white; font-size: 0.8rem; padding: 6px 0; }
+        .navbar-custom { background: #001529; padding: 12px 0; }
+        .navbar-brand { font-weight: 900; font-size: 1.8rem; color: white !important; letter-spacing: -1px; }
+        .navbar-brand span { color: #e63946; }
+        .nav-link-custom { color: #ccc !important; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-link-custom:hover { color: white !important; }
+        .breaking-bar { background: #111; color: white; padding: 10px 0; overflow: hidden; white-space: nowrap; }
+        .breaking-bar .label { background: #e63946; padding: 4px 12px; font-weight: bold; font-size: 0.85rem; margin-right: 16px; border-radius: 3px; }
+        .marquee { display: inline-block; animation: marquee 20s linear infinite; font-size: 0.9rem; }
+        @keyframes marquee { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
+        .section-title { font-weight: 800; font-size: 1.4rem; color: #2c3e50; border-left: 4px solid #e63946; padding-left: 12px; margin-bottom: 20px; }
+        .featured-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .featured-card img { width: 100%; height: 420px; object-fit: cover; }
+        .featured-card .body { padding: 28px; }
+        .featured-card .body h2 { font-weight: 800; font-size: 1.8rem; color: #2c3e50; }
+        .news-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; height: 100%; display: flex; flex-direction: column; }
+        .news-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .news-card img { width: 100%; height: 180px; object-fit: cover; }
+        .news-card .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+        .news-card .card-title { font-size: 1rem; font-weight: 700; color: #2c3e50; }
+        .news-card .card-text { font-size: 0.85rem; color: #666; flex: 1; }
+        .news-card .meta { font-size: 0.75rem; color: #999; margin-top: 8px; }
+        .cat-badge { background: #e63946; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; margin-right: 4px; text-decoration: none; }
+        .tag-badge { background: #e8f4fd; color: #1890ff; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; margin-right: 4px; }
+        .divider { height: 3px; background: linear-gradient(to right, #e63946, transparent); margin-bottom: 32px; border: none; }
+        footer { background: #001529; color: #aaa; padding: 32px 0; margin-top: 60px; font-size: 0.9rem; }
+        footer a { color: #aaa; text-decoration: none; }
+        footer a:hover { color: white; }
+    </style>
+</head>
+<body>
+
+<!-- ÜST BAR -->
+<div class="top-bar">
+    <div class="container d-flex justify-content-between">
+        <span>📅 <span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy')}">Bugün</span></span>
+        <span>Güncel Haberler · Tarafsız Gazetecilik</span>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar-custom">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="/">News<span>CMS</span></a>
+        <div class="d-flex align-items-center gap-3">
+			<a th:each="cat : ${categories}" th:href="@{/kategori/{slug}(slug=${cat.slug})}" th:text="${cat.name}" class="nav-link-custom"></a>
+            <sec:authorize access="isAuthenticated()">
+                <a class="btn btn-sm btn-outline-light ms-3" th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
+				<form th:action="@{/search}" method="get" class="d-flex me-2">
+				    <input type="text" name="q" placeholder="Haber ara..." 
+				           class="form-control form-control-sm me-2" style="width:200px;">
+				    <button type="submit" class="btn btn-sm btn-danger">Ara</button>
+				</form>
+                <a class="btn btn-sm btn-danger" th:href="@{/logout}">Çıkış</a>
+            </sec:authorize>
+            <sec:authorize access="isAnonymous()">
+                <a class="btn btn-sm btn-outline-light" th:href="@{/login}">Giriş</a>
+            </sec:authorize>
+        </div>
+    </div>
+</nav>
+
+<!-- KAYAN SON DAKİKA BANDI -->
+<div class="breaking-bar" th:if="${newsList != null && !newsList.isEmpty()}">
+    <div class="container" style="overflow:hidden;">
+        <span class="label">SON DAKİKA</span>
+        <span class="marquee" th:text="${#strings.listJoin(newsList.![title], ' · ')}"></span>
+    </div>
+</div>
+
+<div class="container mt-4 mb-5">
+
+    <!-- ÖNE ÇIKAN HABER -->
+    <div th:if="${newsList != null && !newsList.isEmpty()}" class="mb-5">
+        <div class="section-title">Öne Çıkan Haber</div>
+        <div class="featured-card" th:with="f=${newsList[0]}">
+            <img th:if="${f.imageUrl != null && !#strings.isEmpty(f.imageUrl)}"
+                 th:src="${f.imageUrl}" alt="Öne Çıkan"
+                 onerror="this.src='https://via.placeholder.com/1200x420?text=Gorsel+Yok'">
+            <img th:unless="${f.imageUrl != null && !#strings.isEmpty(f.imageUrl)}"
+                 src="https://via.placeholder.com/1200x420?text=Gorsel+Eklenmedi" alt="Varsayılan">
+            <div class="body">
+                <div class="mb-2">
+                    <span class="cat-badge" th:if="${f.category != null}" th:text="${f.category.name}"></span>
+                    <span th:each="tag : ${f.tags}" class="tag-badge" th:text="${tag.name}"></span>
+                </div>
+                <h2 th:text="${f.title}">Haber Başlığı</h2>
+                <p class="text-muted" th:text="${#strings.abbreviate(f.content, 250)}"></p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <small class="text-muted">
+                        ✍️ <strong th:text="${f.author != null ? f.author : 'Anonim'}"></strong>
+                        · 🕐 <span th:text="${f.createdAt != null ? f.createdAt.toString().substring(0,10) : ''}"></span>
+                    </small>
+					<a th:href="@{/news/{id}(id=${f.id})}" class="btn btn-danger px-4">Haberi Oku →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- SON HABERLER -->
+    <div th:if="${newsList != null && newsList.size() > 1}">
+        <div class="section-title">Son Haberler</div>
+        <div class="row g-4">
+            <div th:each="n, i : ${newsList}" th:if="${i.index > 0}" class="col-md-4">
+                <div class="news-card">
+                    <img th:if="${n.imageUrl != null && !#strings.isEmpty(n.imageUrl)}"
+                         th:src="${n.imageUrl}" alt="Haber"
+                         onerror="this.src='https://via.placeholder.com/400x180?text=Gorsel+Yok'">
+                    <img th:unless="${n.imageUrl != null && !#strings.isEmpty(n.imageUrl)}"
+                         src="https://via.placeholder.com/400x180?text=Gorsel+Yok" alt="Varsayılan">
+                    <div class="card-body">
+                        <div class="mb-1">
+                            <span class="cat-badge" th:if="${n.category != null}" th:text="${n.category.name}"></span>
+                            <span th:each="tag : ${n.tags}" class="tag-badge" th:text="${tag.name}"></span>
+                        </div>
+                        <div class="card-title mt-1" th:text="${n.title}"></div>
+                        <div class="card-text" th:text="${#strings.abbreviate(n.content, 100)}"></div>
+                        <div class="meta">
+                            ✍️ <span th:text="${n.author != null ? n.author : 'Anonim'}"></span> ·
+                            🕐 <span th:text="${n.createdAt != null ? n.createdAt.toString().substring(0,10) : ''}"></span>
+                        </div>
+						<a th:href="@{/news/{id}(id=${n.id})}" class="btn btn-sm btn-outline-danger mt-3 align-self-start">Haberi Oku →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${newsList == null || newsList.isEmpty()}" class="text-center py-5 text-muted">
+        <h3>Henüz haber eklenmemiş.</h3>
+        <p>Admin panelinden haber ekleyebilirsiniz.</p>
+    </div>
+
+</div>
+<!-- PAGİNATİON -->
+<div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4 mb-3">
+    <nav>
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/(page=${currentPage - 1})}">← Önceki</a>
+            </li>
+            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/(page=${currentPage + 1})}">Sonraki →</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <strong style="color:white;">NewsCMS</strong><br>
+            <small>© 2026 Tüm hakları saklıdır.</small>
+        </div>
+        <div class="d-flex gap-3">
+            <a href="/">Ana Sayfa</a>
+            <a th:href="@{/login}">Giriş</a>
+            <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

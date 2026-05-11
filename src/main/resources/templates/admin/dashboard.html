@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - News CMS</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f0f2f5; }
+        .navbar { background: #001529; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; margin-left: 16px; }
+        .navbar span { color: white; font-weight: bold; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 16px; }
+        h1 { color: #333; }
+        h2 { color: #444; margin-top: 40px; }
+        .stats { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: white; padding: 24px; border-radius: 8px; flex: 1 1 150px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .stat-card h2 { margin: 0; font-size: 36px; color: #1890ff; }
+        .stat-card p { margin: 8px 0 0 0; color: #666; }
+        .table-wrapper { overflow-x: auto; margin-bottom: 32px; }
+        table { width: 100%; background: white; border-radius: 8px; border-collapse: collapse; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        th { background: #fafafa; padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
+        .btn { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; display: inline-block; font-size: 13px; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-info { background: #1890ff; color: white; }
+        .btn-warning { background: #faad14; color: white; }
+        .btn-primary { background: #1890ff; color: white; }
+        .badge { padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+        .badge-draft { background: #fff7e6; color: #d46b08; }
+        .badge-published { background: #f6ffed; color: #389e0d; }
+        .badge-archived { background: #f5f5f5; color: #8c8c8c; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <span>News CMS - Admin Panel</span>
+    <div>
+        <span sec:authentication="name"></span>
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+<div class="container">
+    <h1>Dashboard</h1>
+
+    <div class="stats">
+        <div class="stat-card"><h2 th:text="${articleCount}">0</h2><p>Articles</p></div>
+        <div class="stat-card"><h2 th:text="${categoryCount}">0</h2><p>Categories</p></div>
+        <div class="stat-card"><h2 th:text="${commentCount}">0</h2><p>Comments</p></div>
+        <div class="stat-card"><h2 th:text="${userCount}">0</h2><p>Users</p></div>
+        <div class="stat-card"><h2 th:text="${auditLogCount}">0</h2><p>Audit Logs</p></div>
+        <div class="stat-card"><h2 th:text="${loginAttemptCount}">0</h2><p>Login Attempts</p></div>
+        <div class="stat-card"><h2 th:text="${mediaFileCount}">0</h2><p>Media Files</p></div>
+        <div class="stat-card"><h2 th:text="${newsCount}">0</h2><p>News</p></div>
+        <div class="stat-card"><h2 th:text="${passwordResetTokenCount}">0</h2><p>Reset Tokens</p></div>
+        <div class="stat-card"><h2 th:text="${persistentLoginCount}">0</h2><p>Persistent Logins</p></div>
+        <div class="stat-card"><h2 th:text="${roleCount}">0</h2><p>Roles</p></div>
+        <div class="stat-card"><h2 th:text="${tagCount}">0</h2><p>Tags</p></div>
+    </div>
+
+    <!-- ARTICLES -->
+    <h2>Articles</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Title</th><th>Author</th><th>Category</th><th>Status</th><th>Published At</th><th>Actions</th></tr>
+            <tr th:each="article : ${articles}">
+                <td th:text="${article.id}"></td>
+                <td th:text="${article.title}"></td>
+                <td th:text="${article.author != null ? article.author.username : '-'}"></td>
+                <td th:text="${article.category != null ? article.category.name : '-'}"></td>
+                <td><span th:class="'badge badge-' + ${article.status.toString().toLowerCase()}" th:text="${article.status}"></span></td>
+                <td th:text="${article.publishedAt != null ? article.publishedAt : '-'}"></td>
+                <td>
+                    <a th:href="@{/admin/articles/{id}/publish(id=${article.id})}" class="btn btn-success">Publish</a>
+                    <a th:href="@{/admin/articles/{id}/edit(id=${article.id})}" class="btn btn-primary">Edit</a>
+                    <a th:href="@{/admin/articles/{id}/delete(id=${article.id})}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- CATEGORIES -->
+    <h2>Categories</h2>
+    <div class="mb-3" style="margin-bottom: 15px;">
+        <a th:href="@{/admin/categories/add}" class="btn btn-primary" style="background:#1890ff; color:white; padding:10px; text-decoration:none; border-radius:5px;">
+            Yeni Kategori Ekle
+        </a>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Slug</th><th>Actions</th></tr>
+            <tr th:each="cat : ${categories}">
+                <td th:text="${cat.id}"></td>
+                <td th:text="${cat.name}"></td>
+                <td th:text="${cat.slug != null ? cat.slug : '-'}"></td>
+                <td>
+                    <a th:href="@{/admin/categories/edit/{id}(id=${cat.id})}" class="btn btn-primary" style="background: #1890ff; color: white;">Edit</a>
+                    <a th:href="@{/admin/categories/{id}/delete(id=${cat.id})}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- COMMENTS -->
+    <h2>Comments</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Content</th><th>Author</th><th>Article</th><th>Created At</th><th>Actions</th></tr>
+            <tr th:each="comment : ${comments}">
+                <td th:text="${comment.id}"></td>
+                <td th:text="${comment.body != null ? #strings.abbreviate(comment.body, 50) : '-'}"></td>
+                <td th:text="${comment.user != null ? comment.user.username : comment.guestName != null ? comment.guestName : '-'}"></td>
+                <td th:text="${comment.article != null ? comment.article.title : comment.news != null ? comment.news.title : '-'}"></td>
+                <td th:text="${comment.createdAt != null ? comment.createdAt : '-'}"></td>
+                <td>
+                    <a th:if="${comment.status.name() != 'APPROVED'}"
+                       th:href="@{/admin/comments/{id}/approve(id=${comment.id})}"
+                       class="btn btn-success btn-sm">Approve</a>
+                    <a th:if="${comment.status.name() != 'REJECTED'}"
+                       th:href="@{/admin/comments/{id}/reject(id=${comment.id})}"
+                       class="btn btn-warning btn-sm">Reject</a>
+                    <a th:href="@{/admin/comments/{id}/delete(id=${comment.id})}"
+                       class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- USERS -->
+    <h2>Users</h2>
+    <div style="margin-bottom: 15px;">
+        <button onclick="document.getElementById('createUserModal').style.display='flex'"
+                class="btn btn-primary">
+            Yeni Kullanıcı Ekle
+        </button>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Username</th><th>Email</th><th>Enabled</th><th>Created At</th><th>Actions</th></tr>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.enabled}"></td>
+                <td th:text="${user.createdAt != null ? user.createdAt : '-'}"></td>
+                <td>
+                    <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-primary btn-sm">Edit</a>
+                    <a th:if="${user.enabled}" th:href="@{/admin/users/{id}/disable(id=${user.id})}" class="btn btn-warning btn-sm">Disable</a>
+                    <a th:unless="${user.enabled}" th:href="@{/admin/users/{id}/enable(id=${user.id})}" class="btn btn-success btn-sm">Enable</a>
+                    <a th:href="@{/admin/users/{id}/delete(id=${user.id})}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- CREATE USER MODAL -->
+    <div id="createUserModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:32px; border-radius:8px; width:480px; max-width:90%;">
+            <h3 style="margin-top:0;">Yeni Kullanıcı Ekle</h3>
+            <form action="/admin/users/create" method="post">
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; margin-bottom:4px; font-weight:bold;">Kullanıcı Adı *</label>
+                    <input type="text" name="username" required
+                           style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; margin-bottom:4px; font-weight:bold;">E-posta *</label>
+                    <input type="email" name="email" required
+                           style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; margin-bottom:4px; font-weight:bold;">Şifre *</label>
+                    <input type="password" name="password" required
+                           style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                </div>
+                <div style="display:flex; gap:12px; margin-bottom:12px;">
+                    <div style="flex:1;">
+                        <label style="display:block; margin-bottom:4px; font-weight:bold;">Ad</label>
+                        <input type="text" name="firstName"
+                               style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="display:block; margin-bottom:4px; font-weight:bold;">Soyad</label>
+                        <input type="text" name="lastName"
+                               style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:20px;">
+                    <button type="button" onclick="document.getElementById('createUserModal').style.display='none'"
+                            style="padding:8px 16px; background:#f0f0f0; border:none; border-radius:4px; cursor:pointer;">İptal</button>
+                    <button type="submit"
+                            style="padding:8px 16px; background:#1890ff; color:white; border:none; border-radius:4px; cursor:pointer;">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AUDIT LOGS -->
+    <h2>Audit Logs</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Action</th><th>Entity</th><th>Entity ID</th><th>User</th><th>Created At</th><th>Actions</th></tr>
+            <tr th:each="log : ${auditLogs}">
+                <td th:text="${log.id}"></td>
+                <td th:text="${log.action != null ? log.action : '-'}"></td>
+                <td th:text="${log.entityName != null ? log.entityName : '-'}"></td>
+                <td th:text="${log.entityId != null ? log.entityId : '-'}"></td>
+                <td th:text="${log.user != null ? log.user.username : '-'}"></td>
+                <td th:text="${log.createdAt != null ? log.createdAt : '-'}"></td>
+                <td><a th:href="@{/admin/auditlogs/{id}/delete(id=${log.id})}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- LOGIN ATTEMPTS -->
+    <h2>Login Attempts</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Username</th><th>IP Address</th><th>Success</th><th>Attempted At</th><th>Actions</th></tr>
+            <tr th:each="attempt : ${loginAttempts}">
+                <td th:text="${attempt.id}"></td>
+                <td th:text="${attempt.username != null ? attempt.username : '-'}"></td>
+                <td th:text="${attempt.ipAddress != null ? attempt.ipAddress : '-'}"></td>
+                <td th:text="${attempt.successful}"></td>
+                <td th:text="${attempt.attemptedAt != null ? attempt.attemptedAt : '-'}"></td>
+                <td><a th:href="@{/admin/loginattempts/{id}/delete(id=${attempt.id})}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- MEDIA FILES -->
+    <h2>Media Files</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>File Name</th><th>Mime Type</th><th>Size</th><th>Uploaded By</th><th>Created At</th><th>Actions</th></tr>
+            <tr th:each="media : ${mediaFiles}">
+                <td th:text="${media.id}"></td>
+                <td th:text="${media.originalName != null ? media.originalName : '-'}"></td>
+                <td th:text="${media.mimeType != null ? media.mimeType : '-'}"></td>
+                <td th:text="${media.byteSize != null ? media.byteSize : '-'}"></td>
+                <td th:text="${media.uploadedBy != null ? media.uploadedBy.username : '-'}"></td>
+                <td th:text="${media.createdAt != null ? media.createdAt : '-'}"></td>
+                <td><a th:href="@{/admin/mediafiles/{id}/delete(id=${media.id})}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- NEWS -->
+    <h2>News</h2>
+    <div class="mb-3" style="margin-bottom: 15px;">
+        <a th:href="@{/admin/news/add}" class="btn btn-primary" style="background: #1890ff; color: white; padding: 10px; text-decoration: none; border-radius: 5px;">
+            Yeni Haber Ekle
+        </a>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Title</th><th>Author</th><th>Content</th><th>Actions</th></tr>
+            <tr th:each="n : ${newsList}">
+                <td th:text="${n.id}"></td>
+                <td th:text="${n.title != null ? n.title : '-'}"></td>
+                <td th:text="${n.author != null ? n.author : '-'}"></td>
+                <td th:text="${n.content != null ? #strings.abbreviate(n.content, 50) : '-'}"></td>
+                <td>
+                    <a th:href="@{/admin/news/view/{id}(id=${n.id})}" class="btn btn-info btn-sm" style="color: white">View</a>
+                    <a th:href="@{/admin/news/edit/{id}(id=${n.id})}" class="btn btn-success" style="background: #52c41a;">Edit</a>
+                    <a th:href="@{/admin/news/delete/{id}(id=${n.id})}"
+                       class="btn btn-danger"
+                       onclick="return confirm('Silmek istediğine emin misin?')">Delete</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- PASSWORD RESET TOKENS -->
+    <h2>Password Reset Tokens</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Token Hash</th><th>User</th><th>Expires At</th><th>Used?</th><th>Actions</th></tr>
+            <tr th:each="token : ${passwordResetTokens}">
+                <td th:text="${token.id}"></td>
+                <td th:text="${token.tokenHash != null ? #strings.abbreviate(token.tokenHash, 20) : '-'}"></td>
+                <td th:text="${token.user != null ? token.user.username : '-'}"></td>
+                <td th:text="${token.expiresAt != null ? token.expiresAt : '-'}"></td>
+                <td th:text="${token.usedAt != null ? 'Yes' : 'No'}"></td>
+                <td><a th:href="@{/admin/passwordresettokens/{id}/delete(id=${token.id})}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- PERSISTENT LOGINS -->
+    <h2>Persistent Logins</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Username</th><th>Token</th><th>Last Used At</th><th>Actions</th></tr>
+            <tr th:each="pl : ${persistentLogins}">
+                <td th:text="${pl.id}"></td>
+                <td th:text="${pl.user != null ? pl.user.username : '-'}"></td>
+                <td th:text="${pl.token != null ? #strings.abbreviate(pl.token, 20) : '-'}"></td>
+                <td th:text="${pl.lastUsedAt != null ? pl.lastUsedAt : '-'}"></td>
+                <td><a th:href="@{/admin/persistentlogins/{id}/delete(id=${pl.id})}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ROLES -->
+    <h2>Roles</h2>
+    <div style="margin-bottom: 15px;">
+        <button onclick="document.getElementById('createRoleModal').style.display='flex'"
+                class="btn btn-primary">
+            Yeni Rol Ekle
+        </button>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Actions</th></tr>
+            <tr th:each="role : ${roles}">
+                <td th:text="${role.id}"></td>
+                <td th:text="${role.name}"></td>
+                <td><a th:href="@{/admin/roles/{id}/delete(id=${role.id})}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- TAGS -->
+    <h2>Tags</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Slug</th><th>Actions</th></tr>
+            <tr th:each="tag : ${tags}">
+                <td th:text="${tag.id}"></td>
+                <td th:text="${tag.name}"></td>
+                <td th:text="${tag.slug != null ? tag.slug : '-'}"></td>
+                <td><a th:href="@{/admin/tags/{id}/delete(id=${tag.id})}" class="btn btn-danger">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- GRAFİK -->
+    <h2>İstatistikler</h2>
+    <div style="background:white; border-radius:8px; padding:24px; box-shadow:0 2px 6px rgba(0,0,0,0.08); margin-bottom:32px;">
+        <canvas id="statsChart" height="80"></canvas>
+    </div>
+
+</div>
+
+<!-- ROLE MODAL -->
+<div id="createRoleModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:white; padding:32px; border-radius:8px; width:400px; max-width:90%;">
+        <h3 style="margin-top:0; color:#333;">Yeni Rol Ekle</h3>
+        <form action="/admin/roles/create" method="post">
+            <div style="margin-bottom:16px;">
+                <label style="display:block; margin-bottom:6px; font-weight:bold; color:#333;">Rol Adı</label>
+                <input type="text" name="name" placeholder="Örn: MODERATOR" required
+                       style="width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:4px; font-size:14px; display:block; box-sizing:border-box;">
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:20px;">
+                <button type="button"
+                        onclick="document.getElementById('createRoleModal').style.display='none'"
+                        style="padding:8px 16px; background:#f0f0f0; border:none; border-radius:4px; cursor:pointer;">İptal</button>
+                <button type="submit"
+                        style="padding:8px 16px; background:#1890ff; color:white; border:none; border-radius:4px; cursor:pointer;">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Articles', 'Categories', 'Comments', 'Users', 'News', 'Tags', 'Roles'],
+            datasets: [{
+                label: 'Toplam Sayı',
+                data: [
+                    [[${articleCount}]],
+                    [[${categoryCount}]],
+                    [[${commentCount}]],
+                    [[${userCount}]],
+                    [[${newsCount}]],
+                    [[${tagCount}]],
+                    [[${roleCount}]]
+                ],
+                backgroundColor: [
+                    '#1890ff', '#52c41a', '#faad14',
+                    '#f5222d', '#722ed1', '#13c2c2', '#eb2f96'
+                ],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Sistem İstatistikleri',
+                    font: { size: 16 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
