@@ -1,68 +1,147 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Edit Article - özavsrNews</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f0f2f5; }
-        .navbar { background: #001529; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
-        .navbar a { color: white; text-decoration: none; margin-left: 16px; }
-        .navbar span { color: white; font-weight: bold; }
-        .container { max-width: 800px; margin: 40px auto; padding: 0 16px; }
-        h1 { color: #333; }
-        .card { background: white; padding: 32px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 6px; font-weight: bold; color: #555; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
-        textarea { height: 200px; resize: vertical; }
-        .btn { padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; display: inline-block; font-size: 14px; }
-        .btn-primary { background: #1890ff; color: white; }
-        .btn-secondary { background: #f0f0f0; color: #333; margin-left: 8px; }
-        .btn:hover { opacity: 0.85; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f0f2f5;
+        }
+
+        .navbar {
+            background: #001529;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 16px;
+        }
+
+        .navbar span {
+            color: white;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            margin-left: 8px;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
     </style>
 </head>
+
 <body>
-<div class="navbar">
-    <span>özavsrNews - Admin Panel</span>
-    <div>
-        <a th:href="@{/admin/dashboard}">Dashboard</a>
-        <a th:href="@{/logout}">Logout</a>
+    <div class="navbar">
+        <span>özavsrNews - Admin Panel</span>
+        <div>
+            <a th:href="@{/admin/dashboard}">Dashboard</a>
+            <a th:href="@{/logout}">Logout</a>
+        </div>
     </div>
-</div>
-<div class="container">
-    <h1>Edit Article</h1>
-    <div class="card">
-        <form th:action="@{/admin/articles/{id}/edit(id=${article.id})}" method="post">
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" name="title" th:value="${article.title}" required/>
-            </div>
-            <div class="form-group">
-                <label>Slug</label>
-                <input type="text" name="slug" th:value="${article.slug}" required/>
-            </div>
-            <div class="form-group">
-                <label>Summary</label>
-                <input type="text" name="summary" th:value="${article.summary}"/>
-            </div>
-            <div class="form-group">
-                <label>Body</label>
-                <textarea name="body" th:text="${article.body}" required></textarea>
-            </div>
-            <div class="form-group">
-                <label>Category</label>
-                <select name="categoryId">
-                    <option th:each="cat : ${categories}"
-                            th:value="${cat.id}"
-                            th:text="${cat.name}"
+    <div class="container">
+        <h1>Edit Article</h1>
+        <div class="card">
+            <form th:action="@{/admin/articles/{id}/edit(id=${article.id})}" method="post">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" th:value="${article.title}" required />
+                </div>
+                <div class="form-group">
+                    <label>Slug</label>
+                    <input type="text" name="slug" th:value="${article.slug}" required />
+                </div>
+                <div class="form-group">
+                    <label>Summary</label>
+                    <input type="text" name="summary" th:value="${article.summary}" />
+                </div>
+                <div class="form-group">
+                    <label>Body</label>
+                    <textarea name="body" th:text="${article.body}" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="categoryId">
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
                             th:selected="${article.category != null && article.category.id == cat.id}">
-                    </option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-            <a th:href="@{/admin/dashboard}" class="btn btn-secondary">Cancel</a>
-        </form>
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a th:href="@{/admin/dashboard}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
     </div>
-</div>
 </body>
+
 </html>
