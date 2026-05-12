@@ -156,6 +156,29 @@ public class PageController {
         return "redirect:/admin/dashboard";
     }
 
+    @GetMapping("/admin/articles/add")
+    public String addArticleForm(Model model) {
+        model.addAttribute("categories", categoryRepository.findAll());
+        return "admin/add-article";
+    }
+
+    @PostMapping("/admin/articles/add")
+    public String addArticle(@RequestParam("title") String title,
+                             @RequestParam("slug") String slug,
+                             @RequestParam("summary") String summary,
+                             @RequestParam("body") String body,
+                             @RequestParam("categoryId") Long categoryId) {
+        com.news.cms.entity.Article article = new com.news.cms.entity.Article();
+        article.setTitle(title);
+        article.setSlug(slug);
+        article.setSummary(summary);
+        article.setBody(body);
+        article.setStatus(ArticleStatus.DRAFT);
+        categoryRepository.findById(categoryId).ifPresent(article::setCategory);
+        articleRepository.save(article);
+        return "redirect:/admin/dashboard";
+    }
+
     @GetMapping("/admin/articles/{id}/edit")
     public String editArticleForm(@PathVariable("id") Long id, Model model) {
         articleRepository.findById(id).ifPresent(article -> {
@@ -181,6 +204,13 @@ public class PageController {
             articleRepository.save(article);
         });
         return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/articles")
+    public String publicArticles(Model model) {
+        model.addAttribute("articles", articleRepository.findByStatus(ArticleStatus.PUBLISHED));
+        model.addAttribute("categories", categoryRepository.findAll());
+        return "articles";
     }
 
     // ==========================================

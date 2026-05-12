@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Makaleler - özavsrNews</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f0f2f5; }
+        .top-bar { background: #e63946; color: white; font-size: 0.8rem; padding: 6px 0; }
+        .navbar-custom { background: #001529; padding: 12px 0; }
+        .navbar-brand { font-weight: 900; font-size: 1.8rem; color: white !important; letter-spacing: -1px; }
+        .navbar-brand span { color: #e63946; }
+        .nav-link-custom { color: #ccc !important; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-link-custom:hover { color: white !important; }
+        .section-title { font-weight: 800; font-size: 1.4rem; color: #2c3e50; border-left: 4px solid #e63946; padding-left: 12px; margin-bottom: 20px; }
+        .news-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; height: 100%; display: flex; flex-direction: column; padding: 20px; }
+        .news-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .news-card .card-title { font-size: 1.2rem; font-weight: 700; color: #2c3e50; margin-bottom: 10px; }
+        .news-card .card-text { font-size: 0.95rem; color: #555; flex: 1; }
+        .news-card .meta { font-size: 0.85rem; color: #999; margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px; }
+        .cat-badge { background: #e63946; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-bottom: 12px; }
+        footer { background: #001529; color: #aaa; padding: 32px 0; margin-top: 60px; font-size: 0.9rem; }
+        footer a { color: #aaa; text-decoration: none; }
+        footer a:hover { color: white; }
+    </style>
+</head>
+<body>
+
+<!-- ÜST BAR -->
+<div class="top-bar">
+    <div class="container d-flex justify-content-between">
+        <span>📅 <span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy')}">Bugün</span></span>
+        <span>özavsrNews · Makaleler</span>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar-custom">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="/">özavsr<span>News</span></a>
+        <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/articles}" class="nav-link-custom fw-bold" style="color:white!important;">Makaleler</a>
+			<a th:each="cat : ${categories}" th:href="@{/kategori/{slug}(slug=${cat.slug})}" th:text="${cat.name}" class="nav-link-custom"></a>
+            <sec:authorize access="isAuthenticated()">
+                <a class="btn btn-sm btn-outline-light ms-3" th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
+				<form th:action="@{/search}" method="get" class="d-flex me-2">
+				    <input type="text" name="q" placeholder="Haber ara..." 
+				           class="form-control form-control-sm me-2" style="width:200px;">
+				    <button type="submit" class="btn btn-sm btn-danger">Ara</button>
+				</form>
+                <a class="btn btn-sm btn-danger" th:href="@{/logout}">Çıkış</a>
+            </sec:authorize>
+            <sec:authorize access="isAnonymous()">
+                <a class="btn btn-sm btn-outline-light" th:href="@{/login}">Giriş</a>
+            </sec:authorize>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5 mb-5">
+    <div class="section-title">Yayınlanan Makaleler</div>
+    
+    <div th:if="${articles != null && !articles.isEmpty()}" class="row g-4 mt-2">
+        <div th:each="article : ${articles}" class="col-md-6">
+            <div class="news-card">
+                <div>
+                    <span class="cat-badge" th:if="${article.category != null}" th:text="${article.category.name}"></span>
+                </div>
+                <div class="card-title" th:text="${article.title}">Makale Başlığı</div>
+                <div class="card-text" th:text="${article.summary != null ? article.summary : #strings.abbreviate(article.body, 150)}">Makale özeti buraya gelecek...</div>
+                
+                <div class="meta d-flex justify-content-between align-items-center">
+                    <div>
+                        ✍️ <span th:text="${article.author != null ? article.author.username : 'Anonim'}"></span> ·
+                        🕐 <span th:text="${article.publishedAt != null ? article.publishedAt.toString().substring(0,10) : ''}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${articles == null || articles.isEmpty()}" class="text-center py-5 text-muted">
+        <h3>Henüz yayınlanmış bir makale bulunmuyor.</h3>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <strong style="color:white;">özavsrNews</strong><br>
+            <small>© 2026 Tüm hakları saklıdır.</small>
+        </div>
+        <div class="d-flex gap-3">
+            <a href="/">Ana Sayfa</a>
+            <a th:href="@{/articles}">Makaleler</a>
+            <a th:href="@{/login}">Giriş</a>
+            <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

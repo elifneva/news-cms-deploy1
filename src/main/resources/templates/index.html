@@ -52,6 +52,7 @@
     <div class="container d-flex justify-content-between align-items-center">
         <a class="navbar-brand" href="/">özavsr<span>News</span></a>
         <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/articles}" class="nav-link-custom">Makaleler</a>
 			<a th:each="cat : ${categories}" th:href="@{/kategori/{slug}(slug=${cat.slug})}" th:text="${cat.name}" class="nav-link-custom"></a>
             <sec:authorize access="isAuthenticated()">
                 <a class="btn btn-sm btn-outline-light ms-3" th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
