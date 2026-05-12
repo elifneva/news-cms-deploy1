@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Login - News CMS</title>
+    <title>Login - özavsrNews</title>
     <style>
         body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
         .box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 350px; }
@@ -20,7 +20,7 @@
 </head>
 <body>
 <div class="box">
-    <h2>News CMS Login</h2>
+    <h2>özavsrNews Login</h2>
     <div th:if="${param.error}" class="error">Kullanıcı adı veya şifre hatalı.</div>
     <div th:if="${param.logout}" class="error">Çıkış yapıldı.</div>
     <div th:if="${param.resetSuccess}" class="success">Şifreniz başarıyla sıfırlandı. Giriş yapabilirsiniz.</div>

@@ -41,7 +41,7 @@
                         <div class="form-text text-muted">İnternetten kopyaladığınız resim adresini buraya yapıştırın.</div>
                         
                         <img id="previewImg" th:src="*{imageUrl}" class="image-preview" 
-                             th:style="*{imageUrl != null} ? 'display:block' : 'display:none'">
+                             th:style="*{imageUrl != null ? 'display:block' : 'display:none'}">
                     </div>
 					<div class="mb-3">
 					    <label class="form-label fw-bold">Kategori</label>
@@ -62,7 +62,7 @@
 					                   class="form-check-input"
 					                   name="tagIds" 
 					                   th:value="${tag.id}"
-					                   th:checked="${news.tags != null && news.tags.contains(tag)}">
+					                   th:checked="${news.tags != null and news.tags.contains(tag)}">
 					            <label class="form-check-label" th:text="${tag.name}"></label>
 					        </div>
 					    </div>

@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - News CMS</title>
+    <title>Admin Dashboard - özavsrNews</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; background: #f0f2f5; }
         .navbar { background: #001529; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
@@ -34,7 +34,7 @@
 </head>
 <body>
 <div class="navbar">
-    <span>News CMS - Admin Panel</span>
+    <span>özavsrNews - Admin Panel</span>
     <div>
         <span sec:authentication="name"></span>
         <a th:href="@{/}">Home</a>
@@ -106,22 +106,27 @@
     <h2>Comments</h2>
     <div class="table-wrapper">
         <table>
-            <tr><th>ID</th><th>Content</th><th>Author</th><th>Article</th><th>Created At</th><th>Actions</th></tr>
+            <tr><th>ID</th><th>İçerik</th><th>Yazar</th><th>Haber</th><th>Durum</th><th>Tarih</th><th>İşlemler</th></tr>
             <tr th:each="comment : ${comments}">
                 <td th:text="${comment.id}"></td>
                 <td th:text="${comment.body != null ? #strings.abbreviate(comment.body, 50) : '-'}"></td>
                 <td th:text="${comment.user != null ? comment.user.username : comment.guestName != null ? comment.guestName : '-'}"></td>
                 <td th:text="${comment.article != null ? comment.article.title : comment.news != null ? comment.news.title : '-'}"></td>
+                <td>
+                    <span th:if="${comment.status.name() == 'PENDING'}" class="badge bg-warning text-dark" style="background:#ffc107; color:#000;">Bekliyor</span>
+                    <span th:if="${comment.status.name() == 'APPROVED'}" class="badge bg-success" style="background:#198754; color:#fff;">Onaylandı</span>
+                    <span th:if="${comment.status.name() == 'REJECTED'}" class="badge bg-danger" style="background:#dc3545; color:#fff;">Reddedildi</span>
+                </td>
                 <td th:text="${comment.createdAt != null ? comment.createdAt : '-'}"></td>
                 <td>
                     <a th:if="${comment.status.name() != 'APPROVED'}"
                        th:href="@{/admin/comments/{id}/approve(id=${comment.id})}"
-                       class="btn btn-success btn-sm">Approve</a>
+                       class="btn btn-success btn-sm">Onayla</a>
                     <a th:if="${comment.status.name() != 'REJECTED'}"
                        th:href="@{/admin/comments/{id}/reject(id=${comment.id})}"
-                       class="btn btn-warning btn-sm">Reject</a>
+                       class="btn btn-warning btn-sm">Reddet</a>
                     <a th:href="@{/admin/comments/{id}/delete(id=${comment.id})}"
-                       class="btn btn-danger btn-sm">Delete</a>
+                       class="btn btn-danger btn-sm">Sil</a>
                 </td>
             </tr>
         </table>

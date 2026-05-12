@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Register - News CMS</title>
+    <title>Kayıt Ol - özavsrNews</title>
     <style>
         body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
         .box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 350px; }
@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="box">
-    <h2>Register</h2>
+    <h2>özavsrNews Kayıt</h2>
     <div th:if="${error}" class="error" th:text="${error}"></div>
 	<form th:action="@{/api/auth/register}" method="post">
 	   <button type="submit">Kayıt Ol</button>
