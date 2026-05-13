@@ -41,8 +41,8 @@ public class Article {
 	@Column(name = "featured_image_url", length = 500)
 	private String featuredImageUrl;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "author_id", nullable = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "author_id", nullable = false)
 	private User author;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -64,7 +64,7 @@ public class Article {
 	@Builder.Default
 	private boolean active = true;
 
-	@Column(name = "created_at", nullable = false)
+	@Column(name = "created_at", nullable = false, updatable = false)
 	private Instant createdAt;
 
 	@Column(name = "updated_at", nullable = false)

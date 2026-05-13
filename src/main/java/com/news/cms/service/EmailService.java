@@ -13,13 +13,20 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendPasswordResetEmail(String toEmail, String resetLink) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Şifre Sıfırlama - özavsrNews");
-        message.setText("Merhaba,\n\nŞifrenizi sıfırlamak için aşağıdaki linke tıklayın:\n\n"
-                + resetLink
-                + "\n\nBu link 30 dakika geçerlidir.\n\nEğer bu isteği siz yapmadıysanız, bu emaili görmezden gelin.");
-        mailSender.send(message);
+    public boolean sendPasswordResetEmail(String toEmail, String resetLink) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("Şifre Sıfırlama - özavsrNews");
+            message.setText("Merhaba,\n\nŞifrenizi sıfırlamak için aşağıdaki linke tıklayın:\n\n"
+                    + resetLink
+                    + "\n\nBu link 30 dakika geçerlidir.\n\nEğer bu isteği siz yapmadıysanız, bu emaili görmezden gelin.");
+            mailSender.send(message);
+            return true;
+        } catch (Exception e) {
+            // Hata durumunda loglanabilir veya sessizce false dönebilir
+            System.err.println("Email gönderim hatası: " + e.getMessage());
+            return false;
+        }
     }
 }

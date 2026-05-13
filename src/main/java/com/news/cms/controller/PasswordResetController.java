@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Controller
 public class PasswordResetController {
@@ -26,12 +27,22 @@ public class PasswordResetController {
     public String handleForgotPassword(@RequestParam("email") String email,
                                         HttpServletRequest request,
                                         Model model) {
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        boolean sent = passwordResetService.sendResetEmail(email, baseUrl);
-        if (sent) {
+        // Daha güvenli bir baseUrl oluşturma (proxy arkasında da çalışır)
+        String baseUrl = ServletUriComponentsBuilder.fromContextPath(request)
+                .replacePath(null)
+                .build()
+                .toUriString();
+                
+        boolean success = passwordResetService.sendResetEmail(email, baseUrl);
+        if (success) {
             model.addAttribute("message", "Şifre sıfırlama linki email adresinize gönderildi.");
         } else {
-            model.addAttribute("error", "Bu email adresi sistemde kayıtlı değil.");
+            // Hata sebebi e-posta bulunamaması mı yoksa gönderim hatası mı?
+            if (!passwordResetService.userExists(email)) {
+                model.addAttribute("error", "Bu email adresi sistemde kayıtlı değil.");
+            } else {
+                model.addAttribute("error", "E-posta gönderilirken bir hata oluştu. Lütfen sistem yöneticisiyle iletişime geçin veya e-posta ayarlarını kontrol edin.");
+            }
         }
         return "forgot-password";
     }

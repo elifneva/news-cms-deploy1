@@ -43,8 +43,7 @@ public class PasswordResetService {
         tokenRepository.save(resetToken);
 
         String resetLink = baseUrl + "/reset-password?token=" + token;
-        emailService.sendPasswordResetEmail(email, resetLink);
-        return true;
+        return emailService.sendPasswordResetEmail(email, resetLink);
     }
 
     public boolean resetPassword(String token, String newPassword) {
@@ -62,5 +61,8 @@ public class PasswordResetService {
         resetToken.setUsedAt(Instant.now());
         tokenRepository.save(resetToken);
         return true;
+    }
+    public boolean userExists(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

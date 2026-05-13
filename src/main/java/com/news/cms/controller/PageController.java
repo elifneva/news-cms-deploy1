@@ -1,10 +1,12 @@
 package com.news.cms.controller;
 
+import com.news.cms.entity.Article;
 import com.news.cms.entity.Category;
 import com.news.cms.entity.Comment;
 import com.news.cms.entity.User;
 import com.news.cms.repository.*;
 import com.news.cms.entity.enums.ArticleStatus;
+import com.news.cms.service.ArticleService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +41,7 @@ public class PageController {
     private final RoleRepository roleRepository;
     private final TagRepository tagRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ArticleService articleService;
 
     public PageController(ArticleRepository articleRepository,
                           CategoryRepository categoryRepository,
@@ -52,7 +55,8 @@ public class PageController {
                           PersistentLoginRepository persistentLoginRepository,
                           RoleRepository roleRepository,
                           TagRepository tagRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          ArticleService articleService) {
         this.articleRepository = articleRepository;
         this.categoryRepository = categoryRepository;
         this.commentRepository = commentRepository;
@@ -66,6 +70,7 @@ public class PageController {
         this.roleRepository = roleRepository;
         this.tagRepository = tagRepository;
         this.passwordEncoder = passwordEncoder;
+        this.articleService = articleService;
     }
 
     // ==========================================
@@ -166,22 +171,36 @@ public class PageController {
     @PostMapping("/admin/articles/add")
     public String addArticle(@RequestParam("title") String title,
                              @RequestParam("slug") String slug,
-                             @RequestParam("summary") String summary,
+                             @RequestParam(value = "summary", required = false) String summary,
                              @RequestParam("body") String body,
                              @RequestParam(value = "categoryId", required = false) Long categoryId,
                              Principal principal) {
-        com.news.cms.entity.Article article = new com.news.cms.entity.Article();
+        
+        // Slug benzersizliğini kontrol et (ArticleService'deki mantığı burada da uygulayabiliriz veya direkt servisi çağırabiliriz)
+        if (articleRepository.existsBySlug(slug)) {
+            // Hata durumunda formu geri döndür veya yönlendir (şuan için basitlik adına sadece loglayabiliriz ama kullanıcıya 500 dönmemesi için servis üzerinden gitmek en iyisi)
+            return "redirect:/admin/articles/add?error=slug_exists";
+        }
+
+        Article article = new Article();
         article.setTitle(title);
         article.setSlug(slug);
         article.setSummary(summary);
         article.setBody(body);
         article.setStatus(ArticleStatus.DRAFT);
+        
         if (categoryId != null) {
             categoryRepository.findById(categoryId).ifPresent(article::setCategory);
         }
+        
         if (principal != null) {
-            userRepository.findByUsername(principal.getName()).ifPresent(article::setAuthor);
+            User user = userRepository.findByUsername(principal.getName())
+                    .orElseThrow(() -> new RuntimeException("Giriş yapan kullanıcı bulunamadı: " + principal.getName()));
+            article.setAuthor(user);
+        } else {
+            throw new RuntimeException("Makale kaydetmek için giriş yapmalısınız.");
         }
+        
         articleRepository.save(article);
         return "redirect:/admin/dashboard";
     }
@@ -199,15 +218,19 @@ public class PageController {
     public String editArticle(@PathVariable("id") Long id,
                                @RequestParam("title") String title,
                                @RequestParam("slug") String slug,
-                               @RequestParam("summary") String summary,
+                               @RequestParam(value = "summary", required = false) String summary,
                                @RequestParam("body") String body,
-                               @RequestParam("categoryId") Long categoryId) {
+                               @RequestParam(value = "categoryId", required = false) Long categoryId) {
         articleRepository.findById(id).ifPresent(article -> {
             article.setTitle(title);
             article.setSlug(slug);
             article.setSummary(summary);
             article.setBody(body);
-            categoryRepository.findById(categoryId).ifPresent(article::setCategory);
+            if (categoryId != null) {
+                categoryRepository.findById(categoryId).ifPresent(article::setCategory);
+            } else {
+                article.setCategory(null);
+            }
             articleRepository.save(article);
         });
         return "redirect:/admin/dashboard";
