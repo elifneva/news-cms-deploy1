@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.security.Principal;
 
 
 import java.time.Instant;
@@ -167,14 +168,20 @@ public class PageController {
                              @RequestParam("slug") String slug,
                              @RequestParam("summary") String summary,
                              @RequestParam("body") String body,
-                             @RequestParam("categoryId") Long categoryId) {
+                             @RequestParam(value = "categoryId", required = false) Long categoryId,
+                             Principal principal) {
         com.news.cms.entity.Article article = new com.news.cms.entity.Article();
         article.setTitle(title);
         article.setSlug(slug);
         article.setSummary(summary);
         article.setBody(body);
         article.setStatus(ArticleStatus.DRAFT);
-        categoryRepository.findById(categoryId).ifPresent(article::setCategory);
+        if (categoryId != null) {
+            categoryRepository.findById(categoryId).ifPresent(article::setCategory);
+        }
+        if (principal != null) {
+            userRepository.findByUsername(principal.getName()).ifPresent(article::setAuthor);
+        }
         articleRepository.save(article);
         return "redirect:/admin/dashboard";
     }

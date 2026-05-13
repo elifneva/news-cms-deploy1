@@ -41,12 +41,12 @@ public class Article {
 	@Column(name = "featured_image_url", length = 500)
 	private String featuredImageUrl;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "author_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "author_id", nullable = true)
 	private User author;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "category_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "category_id", nullable = true)
 	private Category category;
 
 	@ManyToMany(fetch = FetchType.LAZY)
