@@ -3,135 +3,389 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>özavsrNews</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>özavsrNews - Tarafsız ve Güncel</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background: #f0f2f5; }
-        .top-bar { background: #e63946; color: white; font-size: 0.8rem; padding: 6px 0; }
-        .navbar-custom { background: #001529; padding: 12px 0; }
-        .navbar-brand { font-weight: 900; font-size: 1.8rem; color: white !important; letter-spacing: -1px; }
-        .navbar-brand span { color: #e63946; }
-        .nav-link-custom { color: #ccc !important; font-size: 0.9rem; transition: color 0.2s; }
-        .nav-link-custom:hover { color: white !important; }
-        .breaking-bar { background: #111; color: white; padding: 10px 0; overflow: hidden; white-space: nowrap; }
-        .breaking-bar .label { background: #e63946; padding: 4px 12px; font-weight: bold; font-size: 0.85rem; margin-right: 16px; border-radius: 3px; }
-        .marquee { display: inline-block; animation: marquee 20s linear infinite; font-size: 0.9rem; }
-        @keyframes marquee { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
-        .section-title { font-weight: 800; font-size: 1.4rem; color: #2c3e50; border-left: 4px solid #e63946; padding-left: 12px; margin-bottom: 20px; }
-        .featured-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .featured-card img { width: 100%; height: 420px; object-fit: cover; }
-        .featured-card .body { padding: 28px; }
-        .featured-card .body h2 { font-weight: 800; font-size: 1.8rem; color: #2c3e50; }
-        .news-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; height: 100%; display: flex; flex-direction: column; }
-        .news-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .news-card img { width: 100%; height: 180px; object-fit: cover; }
-        .news-card .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
-        .news-card .card-title { font-size: 1rem; font-weight: 700; color: #2c3e50; }
-        .news-card .card-text { font-size: 0.85rem; color: #666; flex: 1; }
-        .news-card .meta { font-size: 0.75rem; color: #999; margin-top: 8px; }
-        .cat-badge { background: #e63946; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; margin-right: 4px; text-decoration: none; }
-        .tag-badge { background: #e8f4fd; color: #1890ff; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; margin-right: 4px; }
-        .divider { height: 3px; background: linear-gradient(to right, #e63946, transparent); margin-bottom: 32px; border: none; }
-        footer { background: #001529; color: #aaa; padding: 32px 0; margin-top: 60px; font-size: 0.9rem; }
-        footer a { color: #aaa; text-decoration: none; }
-        footer a:hover { color: white; }
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c1121f;
+            --secondary: #001529;
+            --bg-light: #f8f9fa;
+            --text-dark: #2c3e50;
+            --glass: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 8px 30px rgba(0,0,0,0.05);
+        }
+
+        body { 
+            background: var(--bg-light); 
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+        }
+
+        h1, h2, h3, .navbar-brand { font-family: 'Outfit', sans-serif; }
+
+        /* Üst Bar */
+        .top-bar { 
+            background: var(--primary); 
+            color: white; 
+            font-size: 0.75rem; 
+            padding: 8px 0;
+            font-weight: 500;
+        }
+
+        /* Navbar */
+        .navbar-custom { 
+            background: var(--secondary); 
+            padding: 15px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .navbar-brand { 
+            font-weight: 900; 
+            font-size: 2rem; 
+            color: white !important; 
+            letter-spacing: -1.5px;
+            text-transform: lowercase;
+        }
+        .navbar-brand span { color: var(--primary); }
+
+        .nav-link-custom { 
+            color: #bdc3c7 !important; 
+            font-size: 0.95rem; 
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+        }
+        .nav-link-custom:hover { 
+            color: white !important; 
+            transform: translateY(-2px);
+        }
+
+        /* Butonlar */
+        .btn-premium {
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            border: none;
+        }
+        .btn-admin { background: rgba(255,255,255,0.1); color: white !important; backdrop-filter: blur(5px); }
+        .btn-admin:hover { background: white; color: var(--secondary) !important; }
+        
+        .btn-login { background: var(--primary); color: white !important; }
+        .btn-login:hover { background: var(--primary-dark); box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4); }
+
+        .btn-logout { background: #f44336; color: white !important; }
+        
+        /* Arama Kutusu */
+        .search-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px;
+            padding: 5px 15px;
+            color: white;
+            transition: all 0.3s;
+        }
+        .search-box:focus-within {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--primary);
+        }
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            font-size: 0.85rem;
+        }
+        .search-box input::placeholder { color: #888; }
+
+        /* Kategori Barı */
+        .cat-bar {
+            background: white;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0;
+        }
+        .cat-pill {
+            display: inline-block;
+            padding: 6px 18px;
+            margin: 0 5px;
+            border-radius: 50px;
+            background: #f1f2f6;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .cat-pill:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Son Dakika */
+        .breaking-bar { 
+            background: #111; 
+            color: white; 
+            padding: 12px 0; 
+            overflow: hidden; 
+        }
+        .breaking-bar .label { 
+            background: var(--primary); 
+            padding: 5px 15px; 
+            font-weight: 800; 
+            font-size: 0.75rem; 
+            margin-right: 20px; 
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(230, 57, 70, 0.4);
+        }
+        .marquee { 
+            display: inline-block; 
+            animation: marquee 30s linear infinite; 
+            font-size: 0.9rem; 
+            font-weight: 500;
+        }
+
+        /* Finans Barı */
+        .finance-bar {
+            background: #fff;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            box-shadow: inset 0 -2px 10px rgba(0,0,0,0.02);
+        }
+        .finance-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px;
+            border-right: 1px solid #eee;
+        }
+        .finance-item:last-child { border-right: none; }
+        .finance-label { font-size: 0.7rem; font-weight: 800; color: #888; text-transform: uppercase; }
+        .finance-value { font-weight: 700; font-size: 0.95rem; color: #2c3e50; }
+        .finance-change { font-size: 0.75rem; font-weight: 600; }
+        .up { color: #27ae60; }
+        .down { color: #e74c3c; }
+
+        /* Haber Kartları */
+        .section-title { 
+            font-weight: 900; 
+            font-size: 1.6rem; 
+            color: var(--secondary); 
+            border-left: 5px solid var(--primary); 
+            padding-left: 15px; 
+            margin-bottom: 25px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .featured-card { 
+            background: white; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: all 0.4s;
+        }
+        .featured-card:hover { transform: translateY(-5px); }
+        .featured-card img { width: 100%; height: 480px; object-fit: cover; }
+        .featured-card .body { padding: 40px; }
+        .featured-card h2 { font-size: 2.2rem; margin-bottom: 20px; color: var(--secondary); }
+
+        .news-card { 
+            background: white; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        .news-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+        }
+        .news-card img { width: 100%; height: 200px; object-fit: cover; transition: all 0.5s; }
+        .news-card:hover img { transform: scale(1.05); }
+        .news-card .card-body { padding: 20px; flex: 1; }
+        .news-card .card-title { font-size: 1.15rem; line-height: 1.4; margin-bottom: 12px; }
+
+        .cat-badge { 
+            background: var(--primary); 
+            color: white; 
+            padding: 4px 12px; 
+            border-radius: 50px; 
+            font-size: 0.7rem; 
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        /* Footer */
+        footer { 
+            background: var(--secondary); 
+            color: #7f8c8d; 
+            padding: 60px 0; 
+            margin-top: 80px;
+        }
+        footer a { color: #bdc3c7; transition: color 0.3s; }
+        footer a:hover { color: white; text-decoration: none; }
+
+        @keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
     </style>
 </head>
 <body>
 
 <!-- ÜST BAR -->
 <div class="top-bar">
-    <div class="container d-flex justify-content-between">
-        <span>📅 <span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy')}">Bugün</span></span>
-        <span>özavsrNews · Tarafsız Gazetecilik</span>
+    <div class="container d-flex justify-content-between align-items-center">
+        <span><i class="far fa-calendar-alt me-2"></i> <span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy, EEEE')}"></span></span>
+        <div class="d-flex gap-3">
+            <span class="d-none d-md-inline"><i class="fas fa-bolt me-1"></i> Tarafsız Gazetecilik</span>
+            <span class="d-none d-md-inline"><i class="fas fa-map-marker-alt me-1"></i> Türkiye</span>
+        </div>
     </div>
 </div>
 
 <!-- NAVBAR -->
-<nav class="navbar-custom">
+<nav class="navbar-custom sticky-top">
     <div class="container d-flex justify-content-between align-items-center">
-        <a class="navbar-brand" href="/">özavsr<span>News</span></a>
-        <div class="d-flex align-items-center gap-3">
-            <a th:href="@{/articles}" class="nav-link-custom">Makaleler</a>
-			<a th:each="cat : ${categories}" th:href="@{/kategori/{slug}(slug=${cat.slug})}" th:text="${cat.name}" class="nav-link-custom"></a>
+        <a class="navbar-brand" href="/">özavsr<span>news</span></a>
+        
+        <div class="d-flex align-items-center gap-2">
+            <form th:action="@{/search}" method="get" class="search-box d-none d-lg-flex align-items-center">
+                <i class="fas fa-search me-2 text-muted"></i>
+                <input type="text" name="q" placeholder="Gündemi yakala...">
+                <button type="submit" style="display:none;"></button>
+            </form>
+
             <sec:authorize access="isAuthenticated()">
-                <a class="btn btn-sm btn-outline-light ms-3" th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
-				<form th:action="@{/search}" method="get" class="d-flex me-2">
-				    <input type="text" name="q" placeholder="Haber ara..." 
-				           class="form-control form-control-sm me-2" style="width:200px;">
-				    <button type="submit" class="btn btn-sm btn-danger">Ara</button>
-				</form>
-                <a class="btn btn-sm btn-danger" th:href="@{/logout}">Çıkış</a>
+                <a class="btn btn-premium btn-admin" th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Panel</a>
+                <a class="btn btn-premium btn-logout" th:href="@{/logout}">Çıkış</a>
             </sec:authorize>
+            
             <sec:authorize access="isAnonymous()">
-                <a class="btn btn-sm btn-outline-light" th:href="@{/login}">Giriş</a>
+                <a class="btn btn-premium btn-login" th:href="@{/login}">Giriş Yap</a>
             </sec:authorize>
         </div>
     </div>
 </nav>
 
-<!-- KAYAN SON DAKİKA BANDI -->
-<div class="breaking-bar" th:if="${newsList != null && !newsList.isEmpty()}">
-    <div class="container" style="overflow:hidden;">
-        <span class="label">SON DAKİKA</span>
-        <span class="marquee" th:text="${#strings.listJoin(newsList.![title], ' · ')}"></span>
+<!-- KATEGORİ BAR -->
+<div class="cat-bar d-none d-md-block">
+    <div class="container text-center">
+        <a th:href="@{/}" class="cat-pill"><i class="fas fa-home me-1"></i> Ana Sayfa</a>
+        <a th:href="@{/articles}" class="cat-pill">Tüm Makaleler</a>
+        <a th:each="cat : ${categories}" 
+           th:href="@{/kategori/{slug}(slug=${cat.slug})}" 
+           th:text="${cat.name}" 
+           class="cat-pill"></a>
     </div>
 </div>
 
-<div class="container mt-4 mb-5">
+<!-- SON DAKİKA -->
+<div class="breaking-bar" th:if="${newsList != null && !newsList.isEmpty()}">
+    <div class="container d-flex align-items-center">
+        <span class="label">SON DAKİKA</span>
+        <div style="flex:1; overflow:hidden;">
+            <span class="marquee" th:text="${#strings.listJoin(newsList.![title], ' • ')}"></span>
+        </div>
+    </div>
+</div>
+
+<!-- FİNANS BAR -->
+<div class="finance-bar">
+    <div class="container d-flex justify-content-between align-items-center overflow-auto py-1">
+        <div class="finance-item">
+            <span class="finance-label">USD/TRY</span>
+            <span class="finance-value" id="usd-val">34.22</span>
+            <span class="finance-change up">▲ 0.12%</span>
+        </div>
+        <div class="finance-item">
+            <span class="finance-label">EUR/TRY</span>
+            <span class="finance-value" id="eur-val">37.15</span>
+            <span class="finance-change down">▼ 0.05%</span>
+        </div>
+        <div class="finance-item">
+            <span class="finance-label">ALTIN (GR)</span>
+            <span class="finance-value" id="gold-val">2,912</span>
+            <span class="finance-change up">▲ 0.45%</span>
+        </div>
+        <div class="finance-item">
+            <span class="finance-label">BIST 100</span>
+            <span class="finance-value" id="bist-val">9,120</span>
+            <span class="finance-change up">▲ 1.20%</span>
+        </div>
+        <div class="finance-item d-none d-lg-flex">
+            <span class="finance-label">BITCOIN</span>
+            <span class="finance-value" id="btc-val">62,450</span>
+            <span class="finance-change up">▲ 2.1%</span>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5 mb-5">
 
     <!-- ÖNE ÇIKAN HABER -->
     <div th:if="${newsList != null && !newsList.isEmpty()}" class="mb-5">
-        <div class="section-title">Öne Çıkan Haber</div>
+        <div class="section-title"><i class="fas fa-star text-warning"></i> Öne Çıkan Haber</div>
         <div class="featured-card" th:with="f=${newsList[0]}">
-            <img th:if="${f.imageUrl != null && !#strings.isEmpty(f.imageUrl)}"
-                 th:src="${f.imageUrl}" alt="Öne Çıkan"
-                 onerror="this.src='https://via.placeholder.com/1200x420?text=Gorsel+Yok'">
-            <img th:unless="${f.imageUrl != null && !#strings.isEmpty(f.imageUrl)}"
-                 src="https://via.placeholder.com/1200x420?text=Gorsel+Eklenmedi" alt="Varsayılan">
-            <div class="body">
-                <div class="mb-2">
-                    <span class="cat-badge" th:if="${f.category != null}" th:text="${f.category.name}"></span>
-                    <span th:each="tag : ${f.tags}" class="tag-badge" th:text="${tag.name}"></span>
+            <div class="row g-0">
+                <div class="col-lg-7">
+                    <img th:if="${f.imageUrl != null && !#strings.isEmpty(f.imageUrl)}"
+                         th:src="${f.imageUrl}" alt="Öne Çıkan"
+                         onerror="this.src='https://via.placeholder.com/1200x420?text=Gorsel+Yok'">
                 </div>
-                <h2 th:text="${f.title}">Haber Başlığı</h2>
-                <p class="text-muted" th:text="${#strings.abbreviate(f.content, 250)}"></p>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <small class="text-muted">
-                        ✍️ <strong th:text="${f.author != null ? f.author : 'Anonim'}"></strong>
-                        · 🕐 <span th:text="${f.createdAt != null ? f.createdAt.toString().substring(0,10) : ''}"></span>
-                    </small>
-					<a th:href="@{/news/{id}(id=${f.id})}" class="btn btn-danger px-4">Haberi Oku →</a>
+                <div class="col-lg-5 d-flex align-items-center">
+                    <div class="body">
+                        <div class="mb-3">
+                            <span class="cat-badge" th:if="${f.category != null}" th:text="${f.category.name}"></span>
+                        </div>
+                        <h2 th:text="${f.title}">Haber Başlığı</h2>
+                        <p class="text-muted mb-4" th:text="${#strings.abbreviate(f.content, 200)}"></p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-user-edit me-1"></i> <strong th:text="${f.author != null ? f.author : 'Anonim'}"></strong><br>
+                                <i class="far fa-clock me-1"></i> <span th:text="${f.createdAt != null ? f.createdAt.toString().substring(0,10) : ''}"></span>
+                            </small>
+                            <a th:href="@{/news/{id}(id=${f.id})}" class="btn btn-danger btn-premium shadow-sm">Haberi Oku <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <hr class="divider">
-
     <!-- SON HABERLER -->
     <div th:if="${newsList != null && newsList.size() > 1}">
-        <div class="section-title">Son Haberler</div>
+        <div class="section-title"><i class="fas fa-clock text-danger"></i> Son Haberler</div>
         <div class="row g-4">
-            <div th:each="n, i : ${newsList}" th:if="${i.index > 0}" class="col-md-4">
+            <div th:each="n, i : ${newsList}" th:if="${i.index > 0}" class="col-md-6 col-lg-4">
                 <div class="news-card">
-                    <img th:if="${n.imageUrl != null && !#strings.isEmpty(n.imageUrl)}"
-                         th:src="${n.imageUrl}" alt="Haber"
-                         onerror="this.src='https://via.placeholder.com/400x180?text=Gorsel+Yok'">
-                    <img th:unless="${n.imageUrl != null && !#strings.isEmpty(n.imageUrl)}"
-                         src="https://via.placeholder.com/400x180?text=Gorsel+Yok" alt="Varsayılan">
+                    <div class="position-relative">
+                        <img th:if="${n.imageUrl != null && !#strings.isEmpty(n.imageUrl)}"
+                             th:src="${n.imageUrl}" alt="Haber"
+                             onerror="this.src='https://via.placeholder.com/400x180?text=Gorsel+Yok'">
+                        <span class="cat-badge position-absolute" style="top:15px; left:15px; opacity:0.9;" 
+                              th:if="${n.category != null}" th:text="${n.category.name}"></span>
+                    </div>
                     <div class="card-body">
-                        <div class="mb-1">
-                            <span class="cat-badge" th:if="${n.category != null}" th:text="${n.category.name}"></span>
-                            <span th:each="tag : ${n.tags}" class="tag-badge" th:text="${tag.name}"></span>
+                        <h5 class="card-title fw-bold" th:text="${n.title}"></h5>
+                        <p class="card-text text-muted" th:text="${#strings.abbreviate(n.content, 110)}"></p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <small class="text-muted" style="font-size:0.75rem;">
+                                <i class="fas fa-history me-1"></i> <span th:text="${n.createdAt != null ? n.createdAt.toString().substring(0,10) : ''}"></span>
+                            </small>
+                            <a th:href="@{/news/{id}(id=${n.id})}" class="btn btn-sm btn-link text-danger fw-bold p-0 text-decoration-none">Detaylar <i class="fas fa-chevron-right ms-1"></i></a>
                         </div>
-                        <div class="card-title mt-1" th:text="${n.title}"></div>
-                        <div class="card-text" th:text="${#strings.abbreviate(n.content, 100)}"></div>
-                        <div class="meta">
-                            ✍️ <span th:text="${n.author != null ? n.author : 'Anonim'}"></span> ·
-                            🕐 <span th:text="${n.createdAt != null ? n.createdAt.toString().substring(0,10) : ''}"></span>
-                        </div>
-						<a th:href="@{/news/{id}(id=${n.id})}" class="btn btn-sm btn-outline-danger mt-3 align-self-start">Haberi Oku →</a>
                     </div>
                 </div>
             </div>
@@ -139,24 +393,26 @@
     </div>
 
     <div th:if="${newsList == null || newsList.isEmpty()}" class="text-center py-5 text-muted">
+        <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
         <h3>Henüz haber eklenmemiş.</h3>
         <p>Admin panelinden haber ekleyebilirsiniz.</p>
     </div>
 
 </div>
+
 <!-- PAGİNATİON -->
-<div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4 mb-3">
+<div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-5 mb-5">
     <nav>
-        <ul class="pagination">
+        <ul class="pagination pagination-sm">
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/(page=${currentPage - 1})}">← Önceki</a>
+                <a class="page-link shadow-sm border-0 rounded-circle me-2" th:href="@{/(page=${currentPage - 1})}"><i class="fas fa-chevron-left"></i></a>
             </li>
             <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                 class="page-item" th:classappend="${i == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/(page=${i})}" th:text="${i + 1}"></a>
+                <a class="page-link shadow-sm border-0 rounded-circle me-2" th:href="@{/(page=${i})}" th:text="${i + 1}"></a>
             </li>
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/(page=${currentPage + 1})}">Sonraki →</a>
+                <a class="page-link shadow-sm border-0 rounded-circle" th:href="@{/(page=${currentPage + 1})}"><i class="fas fa-chevron-right"></i></a>
             </li>
         </ul>
     </nav>
@@ -164,18 +420,61 @@
 
 <!-- FOOTER -->
 <footer>
-    <div class="container d-flex justify-content-between align-items-center">
-        <div>
-            <strong style="color:white;">özavsrNews</strong><br>
-            <small>© 2026 Tüm hakları saklıdır.</small>
-        </div>
-        <div class="d-flex gap-3">
-            <a href="/">Ana Sayfa</a>
-            <a th:href="@{/login}">Giriş</a>
-            <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h3 class="text-white fw-900 mb-3">özavsr<span>news</span></h3>
+                <p class="small">Tarafsız, hızlı ve güvenilir haberin tek adresi. Gündemi bizimle takip edin, dünyadan haberdar olun.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="d-flex gap-4 justify-content-md-end mb-3">
+                    <a href="/"><i class="fas fa-home"></i> Ana Sayfa</a>
+                    <a th:href="@{/login}"><i class="fas fa-sign-in-alt"></i> Giriş</a>
+                    <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')"><i class="fas fa-user-shield"></i> Yönetim</a>
+                </div>
+                <div class="small text-muted">© 2026 Tüm hakları saklıdır. özavsrNews Medya Grubu.</div>
+            </div>
         </div>
     </div>
 </footer>
+
+<script>
+    // Canlı Finans Verisi Simulasyonu (Veya gerçek API entegrasyonu)
+    function updateFinance() {
+        const currencies = {
+            'usd': 34.20 + (Math.random() * 0.1 - 0.05),
+            'eur': 37.10 + (Math.random() * 0.1 - 0.05),
+            'gold': 2910 + (Math.random() * 4 - 2),
+            'bist': 9100 + (Math.random() * 20 - 10),
+            'btc': 62400 + (Math.random() * 100 - 50)
+        };
+
+        for (let key in currencies) {
+            const el = document.getElementById(key + '-val');
+            if (el) {
+                const val = currencies[key];
+                el.innerText = key === 'gold' || key === 'bist' || key === 'btc' 
+                    ? val.toLocaleString('tr-TR', { maximumFractionDigits: 0 }) 
+                    : val.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+        }
+    }
+
+    // Gerçek veri çekmek isterseniz (CORS izinli API bulunursa):
+    /*
+    async function fetchRealData() {
+        try {
+            const res = await fetch('https://finans.truncgil.com/today.json');
+            const data = await res.json();
+            document.getElementById('usd-val').innerText = data['USD']['Buying'];
+            // ... diğerleri
+        } catch(e) {}
+    }
+    */
+
+    setInterval(updateFinance, 5000);
+    updateFinance();
+</script>
 
 </body>
 </html>
