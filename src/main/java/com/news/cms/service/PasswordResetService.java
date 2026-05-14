@@ -43,7 +43,8 @@ public class PasswordResetService {
         tokenRepository.save(resetToken);
 
         String resetLink = baseUrl + "/reset-password?token=" + token;
-        return emailService.sendPasswordResetEmail(email, resetLink);
+        emailService.sendPasswordResetEmail(email, resetLink);
+        return true;
     }
 
     public boolean resetPassword(String token, String newPassword) {

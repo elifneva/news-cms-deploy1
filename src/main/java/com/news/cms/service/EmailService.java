@@ -4,6 +4,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
 @Service
 public class EmailService {
 
@@ -13,7 +16,8 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public boolean sendPasswordResetEmail(String toEmail, String resetLink) {
+    @Async
+    public void sendPasswordResetEmail(String toEmail, String resetLink) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(toEmail);
@@ -22,11 +26,8 @@ public class EmailService {
                     + resetLink
                     + "\n\nBu link 30 dakika geçerlidir.\n\nEğer bu isteği siz yapmadıysanız, bu emaili görmezden gelin.");
             mailSender.send(message);
-            return true;
         } catch (Exception e) {
-            // Hata durumunda loglanabilir veya sessizce false dönebilir
             System.err.println("Email gönderim hatası: " + e.getMessage());
-            return false;
         }
     }
 }
