@@ -24,6 +24,12 @@ import java.util.Set;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import com.news.cms.dto.auth.RegisterRequest;
+import com.news.cms.entity.Role;
+import com.news.cms.entity.Tag;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
 public class PageController {
@@ -479,6 +485,53 @@ public class PageController {
         com.news.cms.entity.Role role = new com.news.cms.entity.Role();
         role.setName(name.toUpperCase());
         roleRepository.save(role);
+        return "redirect:/admin/dashboard";
+    }
+
+    @PostMapping("/register")
+    public String registerUser(@Valid @ModelAttribute RegisterRequest request, 
+                               BindingResult bindingResult, 
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error", "Geçersiz giriş. Lütfen tüm alanları doğru doldurun.");
+            return "register";
+        }
+
+        if (userRepository.existsByUsername(request.username())) {
+            model.addAttribute("error", "Bu kullanıcı adı zaten alınmış.");
+            return "register";
+        }
+
+        if (userRepository.existsByEmail(request.email())) {
+            model.addAttribute("error", "Bu e-posta zaten kullanımda.");
+            return "register";
+        }
+
+        Role userRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new RuntimeException("USER rolü bulunamadı."));
+
+        User user = User.builder()
+                .username(request.username())
+                .email(request.email())
+                .passwordHash(passwordEncoder.encode(request.password()))
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .enabled(true)
+                .roles(Set.of(userRole))
+                .build();
+
+        userRepository.save(user);
+
+        return "redirect:/login?resetSuccess";
+    }
+
+    @PostMapping("/admin/tags/create")
+    public String createTag(@RequestParam("name") String name, @RequestParam("slug") String slug) {
+        Tag tag = Tag.builder()
+                .name(name)
+                .slug(slug)
+                .build();
+        tagRepository.save(tag);
         return "redirect:/admin/dashboard";
     }
 }

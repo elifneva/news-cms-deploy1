@@ -18,16 +18,14 @@
 <div class="box">
     <h2>özavsrNews Kayıt</h2>
     <div th:if="${error}" class="error" th:text="${error}"></div>
-	<form th:action="@{/api/auth/register}" method="post">
-	   <button type="submit">Kayıt Ol</button>
-   <form th:action="@{/api/auth/register}" method="post">
-       <input type="text" name="username" placeholder="Kullanıcı Adı" required />
-       <input type="email" name="email" placeholder="E-posta" required />
-       <input type="password" name="password" placeholder="Şifre" required />
-       <input type="text" name="firstName" placeholder="Ad" required />
-       <input type="text" name="lastName" placeholder="Soyad" required />
-       <button type="submit">Kayıt Ol</button>
-   </form>
+    <form th:action="@{/register}" method="post">
+        <input type="text" name="username" placeholder="Kullanıcı Adı" required />
+        <input type="email" name="email" placeholder="E-posta" required />
+        <input type="password" name="password" placeholder="Şifre" required />
+        <input type="text" name="firstName" placeholder="Ad" required />
+        <input type="text" name="lastName" placeholder="Soyad" required />
+        <button type="submit">Kayıt Ol</button>
+    </form>
     <div class="login">
         Already have an account? <a th:href="@{/login}">Login</a>
     </div>
